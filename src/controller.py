@@ -1,5 +1,7 @@
 from src.robot import robot
 import numpy as np
+from traitlets import HasTraits
+import traitlets
 
 def get_step(x):
     return 1 if x > 0 else (-1 if x < 0 else 0)
@@ -7,19 +9,23 @@ def get_step(x):
 stepfunc = np.vectorize(get_step)
 num_joints = 12
 
-class Controller:
+class Controller(HasTraits):
+
+    step_size = traitlets.Int(default_value = 10).tag(config=True)
+    at_target = traitlets.Bool()
+    moving = traitlets.Bool()
 
     def __init__(self):
         self.robot = robot
         self.position = robot.home
         self.target = robot.home
-        self.step_size = 5
-        self.goto(self.target)
-        self.at_target=True
         self.iterations = 0
+        self.goto(self.target)
+        self.at_target = False
+        self.moving = False
 
     def apply_position(self, target):
-        target = (target * robot.dir) + robot.adj
+        target = (target + robot.adj) * robot.dir
         print(f'applied {target}')
 
     def goto(self, target: np.ndarray):
@@ -34,11 +40,13 @@ class Controller:
 
     def step(self):
         print(f'iterations: {self.iterations}')
-        self.at_target = (sum(sum(self.position == self.target)) == num_joints)
+        self.at_target: bool = bool(sum(sum(self.position == self.target)) == num_joints)
         if self.at_target:
             self.iterations = 0
+            self.moving = False
             return
         
+        self.moving = True
         new_pos = self.position
 
         for i in range(self.step_size):
