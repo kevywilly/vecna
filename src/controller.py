@@ -1,7 +1,11 @@
 from src.robot import robot
+from adafruit_servokit import ServoKit
 import numpy as np
-from traitlets import HasTraits
 import traitlets
+from traitlets import HasTraits
+import logging
+
+logger = logging.getLogger('VECNA')
 
 def get_step(x):
     return 1 if x > 0 else (-1 if x < 0 else 0)
@@ -23,10 +27,15 @@ class Controller(HasTraits):
         self.goto(self.target)
         self.at_target = False
         self.moving = False
+        try: 
+            self.kit = ServoKit(channels=16)
+        except Exception as ex:
+            logger.error(f"Could not load ServoKit: {ex._str_}")
+
 
     def apply_position(self, target):
         target = (target + robot.adj) * robot.dir
-        print(f'applied {target}')
+        logger.info(f'applied {target}')
 
     def goto(self, target: np.ndarray):
         self.apply_position(target)
