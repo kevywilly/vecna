@@ -1,23 +1,50 @@
-from src.controller import Controller
 import time
-if __name__ == "__main__":
-    controller = Controller()
-    # controller.set_target(controller.robot.squat)
-    # while not controller.at_target:
-    #    controller.step()
+from src.controller import Controller
+from src.vecna import Vecna
+
+controller = Controller()
+
+def home():
+    global controller
+    controller.goto(Vecna.home)
+    while 1:
+        pass
+
+
+def demo():
+    global controller
+    while 1:
+        controller.set_target(Vecna.home)
+        controller.wait_for_target()
+
+        time.sleep(2)
+
+        controller.set_target(Vecna.squat)
+        controller.wait_for_target()
+
+        time.sleep(1)
     
-    # while 1:
-    controller.set_target(controller.robot.squat)
 
-    while not controller.at_target:
-        controller.step()
-        time.sleep(.01)
+        controller.set_target(Vecna.stretch)
+        controller.wait_for_target()
 
-    controller.set_target(controller.robot.twist)
+        time.sleep(1)
 
-    time.sleep(1)
-    while not controller.at_target:
-        controller.step()
-        time.sleep(.01)
+        controller.set_target(Vecna.home)
+        controller.wait_for_target()
 
-    controller.stop()
+        time.sleep(1)
+
+        controller.set_target(Vecna.twist)
+        controller.wait_for_target()
+
+        time.sleep(1)
+
+        controller.set_target(Vecna.twist * -1)
+        controller.wait_for_target()
+
+        time.sleep(1)
+
+
+home()
+#demo()

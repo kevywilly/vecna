@@ -1,10 +1,11 @@
-from src.robot import robot
+from src.vecna import Vecna
 from adafruit_servokit import ServoKit
 import numpy as np
 import traitlets
 from traitlets import HasTraits
 from src.log import logger
 import atexit
+import time
 
 def get_step(x):
     return 1 if x > 0 else (-1 if x < 0 else 0)
@@ -14,16 +15,15 @@ num_joints = 12
 
 class Controller(HasTraits):
 
-    step_size = traitlets.Int(default_value = 2).tag(config=True)
+    step_size = traitlets.Int(default_value = 5).tag(config=True)
     at_target = traitlets.Bool()
     moving = traitlets.Bool()
 
 
     def __init__(self):
 
-        self.robot = robot
-        self.position = robot.home
-        self.target = robot.home
+        self.position = Vecna.home
+        self.target = Vecna.home
         self.iterations = 0
 
         try:
@@ -31,7 +31,8 @@ class Controller(HasTraits):
         except Exception as ex:
             logger.error(f'Could not load ServoKit: {ex.__str__()}')
 
-        self.goto(self.target)
+        # self.goto(self.target)
+        self.stop()
         self.at_target = False
         self.moving = False 
         
@@ -39,13 +40,16 @@ class Controller(HasTraits):
 
 
     def apply_position(self, target):
-        angles = (target + robot.adj) * robot.dir + 90
+        
+        angles = (target + Vecna.adj) * Vecna.dir + 90
+
         for i in range(4):
             for j in range(3):
                 angle = angles[i][j]
-                pin = self.robot.joints[i][j]
+                pin = Vecna.joints[i][j]
                 self.kit.servo[pin].angle = angle
-        logger.info(f'applied {target}')
+
+        #logger.info(f'applied {target}')
 
     def goto(self, target: np.ndarray):
         self.apply_position(target)
@@ -56,7 +60,7 @@ class Controller(HasTraits):
         self.at_target = False
 
     def step(self):
-        logger.info(f'iterations: {self.iterations}')
+        #logger.info(f'iterations: {self.iterations}')
         self.at_target: bool = bool(sum(sum(self.position == self.target)) == num_joints)
         if self.at_target:
             self.iterations = 0
@@ -74,10 +78,14 @@ class Controller(HasTraits):
         self.iterations += 1
         self.goto(new_pos)
 
+    def wait_for_target(self, delay = 0.1):
+        while not self.at_target:
+            self.step()
+
     def stop(self):   
         for i in range(4):
                 for j in range(3):
-                    pin = self.robot.joints[i][j]
+                    pin = Vecna.joints[i][j]
                     self.kit.servo[pin].angle = None
 
     def shutdown(self):
@@ -88,7 +96,7 @@ class Controller(HasTraits):
 
 if __name__ == "__main__":
     controller = Controller()
-    controller.set_target(robot.squat)
+    controller.set_target(Vecna.squat)
     while not controller.at_target:
         
         controller.step()
