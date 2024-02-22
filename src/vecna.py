@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class Vecna:
 
     class training:
