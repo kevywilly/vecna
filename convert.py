@@ -1,5 +1,4 @@
 import torch
-import onnx
 import onnx_tf
 
 import settings
@@ -103,7 +102,7 @@ def tf_2_tflite(file_in: str):
     file_out = _file_out(file_in, 'tflite')
     converter = tf.lite.TFLiteConverter.from_saved_model(file_in)
     tflite_model = converter.convert()
-    open('file_out', 'wb').write(tflite_model)
+    open(file_out, 'wb').write(tflite_model)
     return file_out
 
 
