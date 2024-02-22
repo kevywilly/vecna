@@ -35,10 +35,10 @@ class Pose:
     num_links = 12
 
     def __init__(self):
-        self.target = np.zeros(4,3)
+        self.target_angles = np.zeros(4, 3)
         self.angles = np.zeros(4,3)
         self.position = np.zeros(4, 3)
         self.servo_angles = np.zeros(4,3)
 
     def at_target(self):
-        return bool(sum(sum(self.angles == self.target)) == self.num_links)
+        return bool(sum(sum(self.angles == self.target_angles)) == self.num_links)
