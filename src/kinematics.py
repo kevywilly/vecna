@@ -51,10 +51,11 @@ model = nn.Sequential(
     nn.Linear(64,3)
 )
 
-best_model = '/Users/kevywilly/Projects/vecna/best_model.pth'
+best_model = '/home/zero1/vecna/best_model.pth'
 
-
+print('loading model')
 model.load_state_dict(torch.load(best_model))
+print('done')
 
 model.eval()
 

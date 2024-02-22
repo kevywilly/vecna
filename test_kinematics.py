@@ -1,17 +1,22 @@
 from src.kinematics import Kinematics, Vector3
+import time
 import math
+t0 = time.time()
 v0 = Vector3(0,0,0)
 pose = Kinematics.forward(v0)
 a0 = Kinematics.inverse(pose)
 p0 = Kinematics.forward(a0)
 print('angle_actual',v0,'\tpose_actual\t',pose, '\nangle_predicted\t', a0, '\tpose_predicted\t', p0)
+print(time.time()-t0)
 print('------------------------------------------------------------')
 
+t0 = time.time()
 v0 = Vector3(0,40,42)
 pose = Kinematics.forward(v0)
 a0 = Kinematics.inverse(pose)
 p0 = Kinematics.forward(a0)
 print('angle_actual',v0,'\tpose_actual\t',pose, '\nangle_predicted\t', a0, '\tpose_predicted\t', p0)
+print(time.time()-t0)
 print('------------------------------------------------------------')
 
 pose = Vector3(0,63,40)
